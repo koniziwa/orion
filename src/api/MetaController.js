@@ -1,12 +1,12 @@
 import axios from 'axios'
 
 import GENIUS_URL from '../constants/GENIUS_URL.js'
-import geniusToken from '../private/geniusToken.js'
+import GENIUS_ACCESS_TOKEN from '../private/GENIUS_ACCESS_TOKEN.js'
 
 class MetaController {
   params = {
     headers: {
-      Authorization: `Bearer ${geniusToken}`,
+      Authorization: `Bearer ${GENIUS_ACCESS_TOKEN}`,
     },
   }
 
@@ -15,15 +15,23 @@ class MetaController {
 
     const { title, album, artist_names } = data.response.song
 
-    console.log(title, artist_names)
+    if (!album)
+      return {
+        title,
+        album: title,
+        artist: artist_names,
+        album_artist: artist_names,
+      }
 
-    if (album) {
-      const { name, artist } = album
-      console.log(name, artist.name)
+    return {
+      title,
+      album: album.name,
+      artist: artist_names,
+      album_artist: album.artist.name,
     }
   }
 
-  async getSongs(query) {
+  async getSongsList(query) {
     const { data } = await axios.get(
       `${GENIUS_URL}/search?q=${query}`,
       this.params
@@ -31,10 +39,11 @@ class MetaController {
 
     const { hits } = data.response
     const results = hits.map(({ result }, id) => {
-      return `[${id + 1}] ${result.artist_names} - ${result.title}`
+      return {
+        title: `[${id + 1}] ${result.artist_names} - ${result.title}`,
+        route: result.api_path,
+      }
     })
-
-    await this.fetchSongData(hits[0].result.api_path)
 
     return results
   }
