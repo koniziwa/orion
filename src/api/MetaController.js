@@ -1,6 +1,6 @@
 import axios from 'axios'
 
-import GENIUS_URL from '../constants/GENIUS_URL.js'
+import GENIUS_API_URL from '../constants/GENIUS_API_URL.js'
 import GENIUS_ACCESS_TOKEN from '../private/GENIUS_ACCESS_TOKEN.js'
 
 class MetaController {
@@ -11,29 +11,34 @@ class MetaController {
   }
 
   async fetchSongData(route) {
-    const { data } = await axios.get(GENIUS_URL + route, this.params)
+    const { data } = await axios.get(GENIUS_API_URL + route, this.params)
 
-    const { title, album, artist_names } = data.response.song
+    const { title, album, artist_names, full_title, song_art_image_url } =
+      data.response.song
 
     if (!album)
       return {
+        full_title,
         title,
+        song_art_image_url,
         album: title,
         artist: artist_names,
         album_artist: artist_names,
       }
 
     return {
+      full_title,
       title,
+      song_art_image_url,
       album: album.name,
       artist: artist_names,
       album_artist: album.artist.name,
     }
   }
 
-  async getSongsList(query) {
+  async getMetaList(query) {
     const { data } = await axios.get(
-      `${GENIUS_URL}/search?q=${query}`,
+      `${GENIUS_API_URL}/search?q=${query}`,
       this.params
     )
 

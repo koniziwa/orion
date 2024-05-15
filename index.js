@@ -1,61 +1,70 @@
 import inquirer from 'inquirer'
-import { Subject } from 'rxjs'
 
 import MetaController from './src/api/MetaController.js'
+import AudioController from './src/api/AudioController.js'
 
-const queryHistory = []
+import getBracketsIndex from './src/utils/getBracketsIndex.js'
 
-const prompts = new Subject()
-inquirer.prompt(prompts).ui.process.subscribe({
-  next: async ({ name, answer }) => {
-    switch (name) {
-      case 'query':
-        const songsList = await MetaController.getSongsList(answer)
-        queryHistory.push({
-          query: answer,
-          result: songsList,
-        })
-        const choices = songsList.map(item => item.title)
-        prompts.next({
-          type: 'list',
-          name: 'selectedSong',
-          message: 'Select song for metadata',
-          choices,
-        })
-        break
+const metaQueryHistory = []
+const youtubeQueryHistory = []
+const metaHistory = []
+const idHistory = []
 
-      case 'selectedSong':
-        const { result } = queryHistory[queryHistory.length - 1]
-        const { route } = result[Number(answer[1]) - 1]
-        const songMetadata = await MetaController.fetchSongData(route)
-        console.log(songMetadata)
-        break
+async function askQuery() {
+  const { query } = await inquirer.prompt({
+    type: 'input',
+    name: 'query',
+    message: 'Enter your query',
+  })
 
-      default:
-        break
-    }
-    prompts.complete()
-  },
-  error: e => console.log(e),
-  complete: () => console.log('COMPLETE'),
-})
+  const metaOptions = await MetaController.getMetaList(query)
+  const youtubeOptions = await AudioController.getAudioList(query)
 
-prompts.next({
-  type: 'input',
-  name: 'query',
-  message: 'Enter your query',
-})
+  metaQueryHistory.push(metaOptions)
+  youtubeQueryHistory.push(youtubeOptions)
+}
 
-// const tags = {
-//   title: 'Caliente',
-//   artist: 'Kontra K',
-//   performerInfo: 'NONAME',
-//   unsynchronisedLyrics: {
-//     language: 'eng',
-//     text: 'lyrics',
-//   },
-//   album: 'Single',
-//   APIC: 'https://images.genius.com/4e08cebc1ffa69e057a3b33ecbec670d.1000x1000x1.jpg',
-// }
+async function askMetadata() {
+  const metaOptions = metaQueryHistory[metaQueryHistory.length - 1]
+  const choices = metaOptions.map(item => item.title)
+  const { selectedMetaIndex } = await inquirer.prompt({
+    type: 'list',
+    name: 'selectedMetaIndex',
+    message: 'Select metadata from Genius',
+    choices,
+  })
 
-// NodeID3.write(tags, './test.mp3')
+  const { route } = metaOptions[getBracketsIndex(selectedMetaIndex)]
+  const metadata = await MetaController.fetchSongData(route)
+
+  metaHistory.push(metadata)
+}
+
+async function askAudio() {
+  const youtubeOptions = youtubeQueryHistory[youtubeQueryHistory.length - 1]
+  const choices = youtubeOptions.map(item => item.title)
+  const { selectedAudioIndex } = await inquirer.prompt({
+    type: 'list',
+    name: 'selectedAudioIndex',
+    message: 'Select song from YouTube',
+    choices,
+  })
+
+  const { id } = youtubeOptions[getBracketsIndex(selectedAudioIndex)]
+  idHistory.push(id)
+}
+
+async function getMusic() {
+  const meta = metaHistory[metaHistory.length - 1]
+  const id = idHistory[idHistory.length - 1]
+
+  await AudioController.downloadAudio(id, meta.full_title)
+  await AudioController.setAudioTags(meta)
+
+  console.log('Successfully downloaded!')
+}
+
+await askQuery()
+await askMetadata()
+await askAudio()
+await getMusic()
