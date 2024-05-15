@@ -10,6 +10,7 @@ import YOUTUBE_ACCESS_TOKEN from '../private/YOUTUBE_ACCESS_TOKEN.js'
 
 class AudioController {
   ffmpegPath = shell.which('ffmpeg').stdout
+  filenameRegexp = /[\\\/:*?"<>|]/gi
 
   async getAudioList(query) {
     const { data } = await axios.get(
@@ -33,11 +34,12 @@ class AudioController {
 
   downloadAudio(id, filename) {
     return new Promise(resolve => {
+      const newFilename = filename.replace(this.filenameRegexp, '')
       const stream = ytdl(id, { quality: 'highestaudio', filter: 'audioonly' })
       ffmpeg(stream)
         .setFfmpegPath(this.ffmpegPath)
         .audioBitrate(128)
-        .saveToFile(`./dist/${filename}.mp3`)
+        .saveToFile(`./dist/${newFilename}.mp3`)
         .on('end', () => {
           resolve()
         })
@@ -68,7 +70,8 @@ class AudioController {
       },
     }
 
-    NodeID3.write(tags, `./dist/${full_title}.mp3`)
+    const filename = full_title.replace(this.filenameRegexp, '')
+    NodeID3.write(tags, `./dist/${filename}.mp3`)
   }
 }
 

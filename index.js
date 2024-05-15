@@ -34,7 +34,7 @@ async function askMetadata() {
     choices: [...choices, '[X] There is no my music('],
   })
 
-  if (selectedMetaIndex[1] === 'q') process.exit(0)
+  if (selectedMetaIndex[1] === 'X') process.exit(0)
   const { route } = metaOptions[getBracketsIndex(selectedMetaIndex)]
   const metadata = await MetaController.fetchSongData(route)
 
