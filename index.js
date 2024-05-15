@@ -31,9 +31,10 @@ async function askMetadata() {
     type: 'list',
     name: 'selectedMetaIndex',
     message: 'Select metadata from Genius',
-    choices,
+    choices: [...choices, '[X] There is no my music('],
   })
 
+  if (selectedMetaIndex[1] === 'q') process.exit(0)
   const { route } = metaOptions[getBracketsIndex(selectedMetaIndex)]
   const metadata = await MetaController.fetchSongData(route)
 
@@ -54,7 +55,7 @@ async function askAudio() {
   idHistory.push(id)
 }
 
-async function getMusic() {
+async function downloadMusic() {
   const meta = metaHistory[metaHistory.length - 1]
   const id = idHistory[idHistory.length - 1]
 
@@ -64,7 +65,22 @@ async function getMusic() {
   console.log('Successfully downloaded!')
 }
 
-await askQuery()
-await askMetadata()
-await askAudio()
+async function getMusic() {
+  await askQuery()
+  await askMetadata()
+  await askAudio()
+  await downloadMusic()
+
+  const { continueApplication } = await inquirer.prompt({
+    type: 'confirm',
+    name: 'continueApplication',
+    message: 'Do you want to find another song?',
+    default: true,
+  })
+
+  if (continueApplication) {
+    getMusic()
+  }
+}
+
 await getMusic()
