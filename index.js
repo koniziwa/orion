@@ -1,4 +1,5 @@
 import inquirer from 'inquirer'
+import { existsSync, mkdirSync } from 'fs'
 
 import MetaController from './src/api/MetaController.js'
 import AudioController from './src/api/AudioController.js'
@@ -81,6 +82,10 @@ async function getMusic() {
   if (continueApplication) {
     getMusic()
   }
+}
+
+if (!existsSync('./dist')) {
+  mkdirSync('./dist')
 }
 
 await getMusic()

@@ -53,6 +53,7 @@ class AudioController {
     artist,
     album_artist,
     song_art_image_url,
+    release_date,
   }) {
     const { data } = await axios.get(song_art_image_url, {
       responseType: 'arraybuffer',
@@ -63,6 +64,7 @@ class AudioController {
       artist,
       album,
       performerInfo: album_artist,
+      year: release_date.split('-')[0],
       APIC: {
         mime: 'image/jpg',
         type: { id: 0, name: 'other' },

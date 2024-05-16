@@ -13,13 +13,20 @@ class MetaController {
   async fetchSongData(route) {
     const { data } = await axios.get(GENIUS_API_URL + route, this.params)
 
-    const { title, album, artist_names, full_title, song_art_image_url } =
-      data.response.song
+    const {
+      title,
+      album,
+      artist_names,
+      full_title,
+      song_art_image_url,
+      release_date,
+    } = data.response.song
 
     if (!album)
       return {
         full_title,
         title,
+        release_date,
         song_art_image_url,
         album: title,
         artist: artist_names,
@@ -29,6 +36,7 @@ class MetaController {
     return {
       full_title,
       title,
+      release_date,
       song_art_image_url,
       album: album.name,
       artist: artist_names,
