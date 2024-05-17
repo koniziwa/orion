@@ -64,7 +64,7 @@ class AudioController {
       artist,
       album,
       performerInfo: album_artist,
-      year: release_date.split('-')[0],
+      year: release_date ? release_date.split('-')[0] : null,
       APIC: {
         mime: 'image/jpg',
         type: { id: 0, name: 'other' },
