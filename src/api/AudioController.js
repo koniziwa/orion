@@ -2,7 +2,6 @@ import axios from 'axios'
 import NodeID3 from 'node-id3'
 import shell from 'shelljs'
 import ytdl from 'ytdl-core'
-// import { readFileSync } from 'fs'
 import ffmpeg from 'fluent-ffmpeg'
 
 import YOUTUBE_API_URL from '../constants/YOUTUBE_API_URL.js'
@@ -16,10 +15,6 @@ class AudioController {
     const { data } = await axios.get(
       `${YOUTUBE_API_URL}?part=snippet&maxResults=10&q=${query}&key=${YOUTUBE_ACCESS_TOKEN}`
     )
-
-    // const data = JSON.parse(
-    //   readFileSync('./src/tests/testYoutubeData.json', 'utf8')
-    // )
 
     const result = data.items.map(({ id, snippet }, index) => {
       const { title, channelTitle } = snippet

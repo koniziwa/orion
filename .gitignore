@@ -2,6 +2,7 @@
 /dist
 
 src/private
+src/tests
 src/data
 
 *.mp3
