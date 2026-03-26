@@ -1,0 +1,26 @@
+{
+  "name": "orion",
+  "version": "1.0.0",
+  "description": "A simple app for downloading music from YouTube, automatically saving each track with complete metadata like title, artist, and cover art for an organized offline library",
+  "homepage": "https://github.com/koniziwa/orion#readme",
+  "bugs": {
+    "url": "https://github.com/koniziwa/orion/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/koniziwa/orion.git"
+  },
+  "license": "GPL-3.0",
+  "author": "Dmitriy Butskiy",
+  "type": "module",
+  "main": "index.js",
+  "scripts": {
+    "dev": "node index.js"
+  },
+  "dependencies": {
+    "@inquirer/prompts": "^8.3.2",
+    "axios": "^1.13.6",
+    "chalk": "^5.6.2",
+    "figlet": "^1.11.0"
+  }
+}
