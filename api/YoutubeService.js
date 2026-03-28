@@ -49,6 +49,8 @@ class YoutubeService {
         'node',
         '-f',
         'bestaudio',
+        '--cookies',
+        'private/cookies.txt',
         '-x',
         '--audio-format',
         'mp3',
